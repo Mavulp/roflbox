@@ -5,11 +5,10 @@
 class KeySender {
 public:
     KeySender();
-    ~KeySender();
+    ~KeySender() {};
 
-    void writeString(std::string text) {writeCharArray(text.c_str());}
     void writeCharArray(const char text[]);
-    void writeKey(char c);
+    void writeChar(char c);
 
     void setDelay(int milliSeconds) {mDelay = milliSeconds;}
 

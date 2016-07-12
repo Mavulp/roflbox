@@ -1,0 +1,11 @@
+ChatKey:t
+ExitKeycode:121
+CharsPerBlock:20
+WaitBetweenBlocks:150
+WaitBetweenKeys:2
+SecondsBetweenAds:30
+GameTitle:Rocket League
+
+Ad:WWW.ROFLBOX.WEBSITE - BEST FREE RL HACK!
+Ad:GET GOOD, GET ROFLBOX!
+Ad:WWW.ROFLBOX.WEBSITE - BEST FREE RL HACK!

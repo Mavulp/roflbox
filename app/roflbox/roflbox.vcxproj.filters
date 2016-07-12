@@ -21,9 +21,15 @@
     <ClCompile Include="KeySender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeySender.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

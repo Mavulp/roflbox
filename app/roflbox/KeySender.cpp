@@ -1,26 +1,22 @@
 #include "KeySender.hpp"
 
 KeySender::KeySender()
+    :mDelay(0)
 {
     mInput.type = INPUT_KEYBOARD;
 }
 
-KeySender::~KeySender()
-{
-}
-
 void KeySender::writeCharArray(const char text[])
 {
-
     for(int i = 0; text[i] != '\0'; i++)
-        writeKey(text[i]);
+        writeChar(text[i]);
 }
 
-void KeySender::writeKey(char c)
+void KeySender::writeChar(char c)
 {
     mInput.ki.dwFlags = 0;
 
-    SHORT vk = VkKeyScanEx(c, mKBLayout);
+    short vk = VkKeyScanEx(c, mKBLayout);
     if(vk & 0x100) // Shift-Key
     {
         mInput.ki.wVk = VK_SHIFT;
