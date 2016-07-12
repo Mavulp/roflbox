@@ -12,13 +12,14 @@ int main()
 {
     KeySender ks;
     std::wstring title;
+    bool isRunning = true;
 
-    Sleep(1000*10);
     ks.setDelay(2);
-    while(true)
+    
+    while(isRunning)
     {
         title = getForegroundTitle();
-        if(title.find(L"Rocket League") != std::string::npos)
+        if(title.find(L"TeamSpeak") != std::string::npos)
         {
             ks.writeKey('t');
             Sleep(160);
@@ -30,10 +31,17 @@ int main()
 
             ks.writeKey('t');
             Sleep(160);
-            ks.writeString("GET GOOD, GET ROFLBOX!");
-            ks.writeKey('\n');
+            ks.writeString("GET GOOD, GET ROFLBOX!\n");
+        }
 
-            Sleep(1000 * 10);
+        for(int i = 0; i < 1000 * 10; i++)
+        {
+            Sleep(1);
+            if(GetAsyncKeyState(VK_F10))
+            {
+                isRunning = false;
+                break;
+            }
         }
     }
     return 0;
