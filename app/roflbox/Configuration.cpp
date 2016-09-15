@@ -1,6 +1,6 @@
 #include "Configuration.hpp"
 #include <fstream>
-#include <sstream>
+#include <cpptoml.h>
 
 Configuration::Configuration()
 {
@@ -15,62 +15,111 @@ Configuration::Configuration(std::string path)
 
 void Configuration::init()
 {
-    charsPerBlock = 15;
-    sleepBetweenBlocks = 150;
-    sleepBetweenLetters = 2;
-    secondsBetweenAds = 30;
+    // Set default Values
     exitKey = 121;
     chatKey = 't';
-    gameTitle = L"Rocket League";
+    gameTitle = "Rocket League";
 }
 
 void Configuration::readFromPath(std::string path)
 {
-    std::ifstream fileReader(path);
-    std::string line;
+    // If the config file does not exist, create it
+    std::ofstream file(path, std::ios::app);
+    if(!file)
+        file << "\n";
+    file.close();
 
-    while(std::getline(fileReader, line))
+    bool validConfig = true;
+
+    // Parse TOML
+    auto config = cpptoml::parse_file("config.toml");
+    auto global = config->get_table("Global");
+
+    // Global Settings
+    if(global)
     {
-        std::stringstream ss(line);
-        std::string name;
-        std::string setting;
+        auto exitKey = global->get_as<int64_t>("ExitKeyCode");
+        auto chatKey = global->get_as<std::string>("ChatKey");
+        auto title   = global->get_as<std::string>("GameTitle");
 
-        if(std::getline(ss, name, ':') && std::getline(ss, setting))
+        if(exitKey)
+            this->exitKey = *exitKey;
+        if(chatKey)
+            this->chatKey = chatKey->c_str()[0];
+        if(title)
+            this->gameTitle = *title;
+
+        if(!(exitKey && chatKey && title))
+            validConfig = false;
+
+    }
+    auto ads = config->get_table_array("Ad");
+
+    // Settings specific to each Ad
+    if(ads)
+    {
+        for(const auto& ad : *ads)
         {
-            if(name == "ExitKeycode")
+            std::vector<std::string> messages;
+
+            auto charsPerBlock      = ad->get_as<int64_t>("CharsPerBlock");
+            auto sleepBetweenBlocks = ad->get_as<int64_t>("SleepBetweenBlocks");
+            auto sleepBetweenChars  = ad->get_as<int64_t>("SleepBetweenChars");
+            auto secondsBetweenAds  = ad->get_as<int64_t>("SecondsBetweenAds");
+
+            auto msgs = ad->get_array_of<std::string>("Messages");
+
+            for(const auto& msg : *msgs)
+                messages.push_back(msg);
+
+            if(charsPerBlock && sleepBetweenBlocks && sleepBetweenChars && secondsBetweenAds
+                    && !messages.empty())
             {
-                HKL kbl = GetKeyboardLayout(0);
-                exitKey = atoi(setting.c_str());
+                Ad a = Ad(*charsPerBlock, *sleepBetweenBlocks, *sleepBetweenChars,
+                        *secondsBetweenAds, messages);
+
+                this->ads.push_back(a);
             }
-            else if(name == "ChatKey")
-            {
-                chatKey = setting.c_str()[0];
-            }
-            else if(name == "Ad")
-            {
-                ads.push_back(setting);
-            }
-            else if(name == "WaitBetweenBlocks")
-            {
-                sleepBetweenBlocks = atoi(setting.c_str());
-            }
-            else if(name == "WaitBetweenKeys")
-            {
-                sleepBetweenLetters = atoi(setting.c_str());
-            }
-            else if(name == "CharsPerBlock")
-            {
-                charsPerBlock = atoi(setting.c_str());
-            }
-            else if(name == "GameTitle")
-            {
-                std::wstring wSetting(setting.begin(), setting.end());
-                gameTitle = wSetting;
-            }
-            else if(name == "SecondsBetweenAds")
-            {
-                secondsBetweenAds = atoi(setting.c_str());
-            }
+            else
+                validConfig = false;
         }
+    }
+    // If the config file is incorrect 
+    // overwrite it with defaults or values that could be read
+    if(!(global && validConfig))
+    {
+
+        std::shared_ptr<cpptoml::table> config = cpptoml::make_table();
+
+        auto global = cpptoml::make_table();
+        global->insert("ExitKeyCode", (int64_t)exitKey);
+        global->insert("ChatKey", std::string(1, chatKey));
+        global->insert("GameTitle", std::string(gameTitle.begin(), gameTitle.end()));
+
+        config->insert("Global", global);
+
+        auto adsTable = cpptoml::make_table_array();
+
+        for(auto &ad : this->ads)
+        {
+            auto adTable = cpptoml::make_table();
+            adTable->insert("CharsPerBlock", (int64_t)ad.charsPerBlock);
+            adTable->insert("SleepBetweenBlocks", (int64_t)ad.sleepBetweenBlocks);
+            adTable->insert("SleepBetweenChars", (int64_t)ad.sleepBetweenChars);
+            adTable->insert("SecondsBetweenAds", (int64_t)ad.secondsBetweenAds);
+
+            auto msgArray = cpptoml::make_array();
+            for(auto &msg : ad.messages){
+                msgArray->push_back(msg);
+            }
+            adTable->insert("Messages", msgArray);
+
+            adsTable->push_back(adTable);
+        }
+        config->insert("Ad", adsTable);
+
+        file.open(path);
+        file << (*config);
+        file.close();
     }
 }

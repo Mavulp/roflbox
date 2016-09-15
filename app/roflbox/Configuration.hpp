@@ -2,6 +2,7 @@
 #include <string>
 #include <Windows.h>
 #include <vector>
+#include "Ad.hpp"
 
 class Configuration {
 public:
@@ -11,14 +12,11 @@ public:
 
     void readFromPath(std::string path);
 
-    int charsPerBlock;
-    int sleepBetweenBlocks;
-    int sleepBetweenLetters;
-    int secondsBetweenAds;
     short exitKey;
     char  chatKey;
-    std::wstring gameTitle;
-    std::vector<std::string> ads;
+    std::string gameTitle;
+
+    std::vector<Ad> ads;
 private:
     void init();
 };
