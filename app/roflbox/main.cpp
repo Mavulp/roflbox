@@ -26,6 +26,9 @@ int main()
         title = getForegroundTitle();
         if(title.find(config.gameTitle) != std::string::npos)
         {
+			// Make sure that Keyboard/Mouse don't interrupt the input
+			BlockInput(true);
+
             for(adIt = config.ads.begin(); adIt != config.ads.end(); adIt++)
             {
                 for(stringIt = adIt->messages.begin(); stringIt != adIt->messages.end(); stringIt++)
@@ -51,6 +54,7 @@ int main()
                     MainKeySender.writeChar('\r');
                 }
             }
+			BlockInput(false);
         }
 
         // TODO Make use of "secondsBetweenAds"
