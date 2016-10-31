@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <chrono>
+#include <time.h>
 
 class Ad {
 public:
@@ -8,6 +10,7 @@ public:
     int sleepBetweenChars = 2;
     int secondsBetweenAds = 30;
 
+    std::chrono::system_clock::time_point secondsSinceDisplay;
     std::vector<std::string> messages;
 
     Ad(){};
@@ -17,5 +20,6 @@ public:
         sleepBetweenBlocks(betweenBlocks),
         sleepBetweenChars(betweenChars),
         secondsBetweenAds(betweenAds),
-        messages(msgs) {};
+        messages(msgs),
+        secondsSinceDisplay(std::chrono::system_clock::now()) {};
 };

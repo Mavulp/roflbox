@@ -1,11 +1,10 @@
 [Global]
-	ExitKeyCode = 121
-	ChatKey = "t"
-	GameTitle = "Rocket League"
+    ExitKeyCode = 121
+    ChatKey = "t"
+    GameTitle = "Rocket League"
 [[Ad]]
-	CharsPerBlock = 20
-	SleepBetweenBlocks = 150
-	SleepBetweenChars = 2
-	# Does not work currently
-	SecondsBetweenAds = 30
-	Messages = ["WWW.ROFLBOX.WEBSITE - BEST FREE RL HACK!", "GET GOOD, GET ROFLBOX!", "WWW.ROFLBOX.WEBSITE - BEST FREE RL HACK!"]
+    CharsPerBlock = 20
+    SleepBetweenBlocks = 150
+    SleepBetweenChars = 2
+    SecondsBetweenAds = 30
+    Messages = ["WWW.ROFLBOX.WEBSITE - BEST FREE RL HACK!", "GET GOOD, GET ROFLBOX!", "WWW.ROFLBOX.WEBSITE - BEST FREE RL HACK!"]

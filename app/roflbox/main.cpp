@@ -14,24 +14,33 @@ int main()
     KeySender MainKeySender;
     Configuration config("config.toml");
 
-    std::vector<Ad>::iterator adIt;
-    std::vector<std::string>::iterator stringIt;
     std::string title;
     const char *text;
     bool isRunning = true;
 
-    while(isRunning)
+    typedef std::chrono::duration<float> floatSeconds;
+
+    while(!GetAsyncKeyState(config.exitKey))
     {
         // Only type ingame
         title = getForegroundTitle();
         if(title.find(config.gameTitle) != std::string::npos)
         {
-			// Make sure that Keyboard/Mouse don't interrupt the input
-			BlockInput(true);
+            // Make sure that Keyboard/Mouse don't interrupt the input
+            BlockInput(true);
 
-            for(adIt = config.ads.begin(); adIt != config.ads.end(); adIt++)
+            auto now = std::chrono::system_clock::now();
+
+            for(auto adIt = config.ads.begin(); adIt != config.ads.end(); adIt++)
             {
-                for(stringIt = adIt->messages.begin(); stringIt != adIt->messages.end(); stringIt++)
+                auto secs = std::chrono::duration_cast<floatSeconds>(now - adIt->secondsSinceDisplay);
+
+                if(secs.count() < adIt->secondsBetweenAds)
+                    continue;
+
+                adIt->secondsSinceDisplay = now;
+
+                for(auto stringIt = adIt->messages.begin(); stringIt != adIt->messages.end(); stringIt++)
                 {
                     if(*stringIt == "")
                         continue;
@@ -54,20 +63,10 @@ int main()
                     MainKeySender.writeChar('\r');
                 }
             }
-			BlockInput(false);
+            BlockInput(false);
         }
 
-        // TODO Make use of "secondsBetweenAds"
-        // Sleep between Ads while checking the exitKey
-        for(int i = 0; i < 1000 * 30; i++)
-        {
-            Sleep(1);
-            if(GetAsyncKeyState(config.exitKey))
-            {
-                isRunning = false;
-                break;
-            }
-        }
+        Sleep(100);
     }
     return 0;
 }
